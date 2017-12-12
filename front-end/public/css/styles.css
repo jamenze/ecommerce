@@ -1,4 +1,10 @@
-body {
+.app-body {
+  margin-top: 100px; }
+
+.navbar-white {
   background-color: white; }
+
+.nav.pull-right li a {
+  display: inline; }
 
 /*# sourceMappingURL=styles.css.map */

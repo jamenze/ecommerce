@@ -35,7 +35,7 @@ const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer);
 
 ReactDOM.render(
 	<Provider store={theStore}>
-		<App />
+		<App /> 
 	</Provider>,
 	document.getElementById('root'
 ));
