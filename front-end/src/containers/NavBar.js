@@ -33,6 +33,10 @@ class NavBar extends Component{
 		}
 		console.log(this.props.auth);
 		console.log(this.props.productLines);
+		var shopMenu = this.props.productLines.map((pl, index)=>{
+			const safeLink = encodeURIComponent(pl.productline);
+			return(<Link key={index} to={`/shop/${safeLink}`}>{pl.productLine}</Link>)
+		})
 		return(
 			<div id="navbar">
 				<nav className="navbar navbar-fixed-top">
@@ -40,7 +44,14 @@ class NavBar extends Component{
 			  			<div className="container">
 				    		<ul className="nav navbar-nav">
 				    			<li><Link to="/">Home</Link></li>
-				    			<li><Link to="/shop">Shop</Link></li>
+				    			<li className="dropdown">
+				    				<Link to="/shop"><i className="arrow down" />Shop</Link>
+				    				<ul>
+				    					<li className="dropdown-links">
+				    						{shopMenu}
+				    					</li>
+				    				</ul>
+				    			</li>
 				    			<li><Link to="/about">About Us</Link></li>
 				    			<li><Link to="/contact">Contact Us</Link></li>
 				    		</ul>

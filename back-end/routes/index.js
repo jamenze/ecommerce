@@ -5,16 +5,14 @@ var config = require('../config/config');
 var connection = mysql.createConnection(config)
 connection.connect();
 
-// include bcrypt for hashing and checking password
+// include bcrpyt for hasing and checking password
 var bcrypt = require('bcrypt-nodejs');
-
-
 // include rand-token for generating a random token
 var randToken = require('rand-token');
 // console.log(randToken.uid(100));
 
 router.post('/login', (req, res, next)=>{
-	res.json(req.body);
+	console.log(req.body);
 	const email = req.body.email;
 	const password = req.body.password;
 
@@ -22,49 +20,53 @@ router.post('/login', (req, res, next)=>{
 		INNER JOIN customers ON users.cid = customers.customerNumber
 		WHERE users.email = ?`;
 	connection.query(checkLoginQuery, [email], (error, results)=>{
-		if (error) {
-			throw error; // dev only
+		if(error){
+			throw error; //dev only
 		}
-		if (results.length === 0) {
-			// this user does not exsist. GOodbye.
-			res.json ({
+		if(results.length === 0){
+			// this user does not exist. Goodbye.
+			res.json({
 				msg: 'badUser'
 			})
-		} else {
-			// this email exists/is valid, see if the password is valid...
-			// password is the english they gave us on the form.
-			// resutls [0].password is what we have for the user in the database
-
+		}else{
+			// this email is valid, see if the password is...
+			// password is the english they gave us on the form
+			// results[0].password is what we have for this user in the DB
 			const checkHash = bcrypt.compareSync(password, results[0].password)
 			const name = results[0].customerName;
-			if (checkHash){
+			if(checkHash){
 				// these are the droids we're looking for.
-				// create a new token
-				// update their row in the database with the token
+				// create a new token.
+				// update their row in teh DB with the token
 				// send some json back to react/ajax/axios
 				const newToken = randToken.uid(100);
-				const updateToken = `UPDATE users SET token = ?`
-				connection.query(updateToken,[newToken, email],(error, results)=>{
-					res.json({
-						msg: "loginSuccess",
-						token: newToken,
-						name: name
-					})
-				}
-			} else {
-				// you don't want to sell me deathsticks.
-				// you want to go home and rethink your life.
-				// they're in the database but gave us a bad password
+				const updateToken = `UPDATE users SET token = ?
+					WHERE email = ?`
+				connection.query(updateToken,[newToken, email],(error)=>{
+					if(error){
+						throw error;
+					}else{
+						res.json({
+							msg: "loginSuccess",
+							token: newToken,
+							name: name
+						});						
+					}
+				})
+			}else{
+				// you dont want to sell me deathsticks. You want to go home
+				// and rethink your life.
 				res.json({
 					msg: "wrongPassword"
-				})
+				}) 
 			}
+		}
 	})
 
-	console.log(req.body);
+	// res.json(req.body);
 });
 
-router.post('/register', (req, res, next)=> {
+router.post('/register', (req,res,next)=>{
 	console.log(req.body);
 	// res.json(req.body);
 	const userData = req.body;
@@ -72,31 +74,26 @@ router.post('/register', (req, res, next)=> {
 	// const nameAsArray = req.body.name.split("");
 	// const firstName = nameAsArray[0]
 
-
-	// Express just got a post request to /register.
-	// This must be from our react app.
-	// Specifically, the /register form.
-	// This means, someone is trying to register!
-	// We have their data inside of userData.
-
-	// We need to insert their data into 2 tables.
-		// 1. Users.
-		// - User table needs their customer ID from the customers table.
-		// - password, which needs to be hashed.
-		// - email
-		// - artbitrary token which Express will create.
-
-		// 2. Customers.
-		// - Will want their name, city, state, salesRep, creditLimit,
-		// - FIRST query will check to see if the user is already in users.
-			// - IF they are, res.json({msg:"userExists"})
-			// - if they AREN'T ... insert user into customers FIRST
-			// (because we need CID for user)
-			// - insert user into users
-			// res.json({msg:"userInsert", token: token, name: name})
-
-		// FIRST check to see if user exists. We will use email.
-		const checkEmail = new Promise((resolve, reject) =>{
+	// Express just got a post request to /register. This must be
+	// from our react app. Specifically, the /register form.
+	// This means, someone is trying to register. We have their data
+	// inside of userData.
+	// We need to insert their data into 2 tables:
+	// 1. Users.
+	//  - Users table needs their customer ID from the customers table
+	//  - password, which needs to be hashed
+	//  - email
+	//  - arbitraty token which Express will create
+	// 2. Customers.
+	// - Name, city, state, salesRep, creditLimit
+	// FIRST query... check to see if the user is already in users.
+	// - if they are, res.json({msg:"userExists"})
+	// - if they aren't...
+	//   - insert user into customers FIRST (because we need CID for users)
+	//   - insert user into users
+	//   - res.json({msg:"userInserted", token: token, name: name})
+	// FIRST check to see if user exists. We will use email.
+	const checkEmail = new Promise((resolve, reject) =>{
 		const checkEmailQuery = `SELECT * FROM users WHERE email = ?;`;
 		connection.query(checkEmailQuery,[userData.email],(error, results)=>{
 			if (error) { 
@@ -162,6 +159,31 @@ router.post('/register', (req, res, next)=> {
 		}
 	)
 })
+
+router.get('/productlines/get', (req, res, next)=>{
+	const selectQuery = `SELECT * FROM productlines`;
+	connection.query(selectQuery,(error, results)=>{
+		if(error){
+			throw error; //dev only
+		}else{
+			res.json(results)
+		}
+	})
+});
+
+router.get('/productlines/:productline/get'),(req, res, next)=>{
+	const pl = req.params.productline
+	var plQuery = `SELECT * FROM productlines
+		INNER JOIN products ON productlines.product = products.productline
+		WHERE productLines.productline = ?`
+	connection.query(plQuery,[pl],(error, results)=>{
+		if (error) {
+			throw error // dev only
+		} else {
+			res.json(results);
+		}
+	})
+});
 
 
 module.exports = router;
