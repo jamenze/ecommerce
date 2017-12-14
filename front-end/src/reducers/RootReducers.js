@@ -14,13 +14,15 @@ import { combineReducers } from 'redux';
 
 // First: AuthReducer 
 import AuthReducer from './AuthReducer';
+import ProductLineReducer from './ProductLineReducer';
 
 // combineReducers takes an object as an arg.
 // that arg has key:value pair = stateName: reducerFunction
 // the reducerFunction will return a value.
 const rootReducer = combineReducers({
-	auth: AuthReducer // call it auth and pass it AuthReducer
+	auth: AuthReducer, // call it auth and pass it AuthReducer
 	// AuthReducer is a function that returns a piece of state.
+	pl: ProductLineReducer
 })
 
 export default rootReducer;
