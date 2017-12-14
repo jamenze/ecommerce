@@ -5,6 +5,8 @@ import App from './App';
 
 // Get the createStore method from the redux module
 // as well as the applyMiddleWare method
+// we always need createStore because that's where
+// state lives.
 import { createStore, applyMiddleware } from 'redux';
 
 // createStore needs a reducer. More specifically,
@@ -21,13 +23,13 @@ import reduxPromise from 'redux-promise';
 import { Provider } from 'react-redux';
 
 // create the store... the ugly way
-const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer);
+console.log(applyMiddleware(reduxPromise)(createStore));
+const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer,window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 // the friendly way:
 // const middleWare = applyMiddleware(reduxPromise);
 // const storeWithMid = middleware(createStore);
 // const theStore = storeWithMid(RootReducer);
-
 
 // Hand render the Provider and hand Provider the store
 // Put App INSIDE of the Provider, so that everything inside of APp,
@@ -35,8 +37,7 @@ const theStore = applyMiddleware(reduxPromise)(createStore)(RootReducer);
 
 ReactDOM.render(
 	<Provider store={theStore}>
-		<App /> 
-	</Provider>,
+		<App />
+	</Provider>, 
 	document.getElementById('root'
 ));
-

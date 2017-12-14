@@ -5,79 +5,111 @@ var config = require('../config/config');
 var connection = mysql.createConnection(config)
 connection.connect();
 
-router.post('/addTask',(req, res)=>{
-	const taskName = req.body.taskName;
-	const taskDate = req.body.taskDate;
-	var thePromise = new Promise((resolve, reject)=>{
-		const insertQuery = `INSERT INTO tasks (taskName,taskDate)
-			VALUES (?,?);`
-		connection.query(insertQuery,[taskName,taskDate],(error)=>{
-			if(error){
-				reject(error);
-			}else{
-				resolve({msg:"success"});
-			}
-		})
-	})
-	thePromise.then((promiseResponse)=>{
-		const selectQuery = `SELECT * FROM tasks`;
-		connection.query(selectQuery,(error,results)=>{
-			if(error){
-				throw error;
-			}else{
-				res.json(results);
-			}
-		})
-	})
-});
+// include bcrypt for hashing and checking password
+var bcrypt = require('bcrypt-nodejs');
 
-/* GET home page. */
-router.get('/getStudents', function(req, res, next) {
-	const selectQuery = `SELECT * FROM students`;
-	connection.query(selectQuery,(error, results)=>{
-		if (error){
-			throw error;
-		}else{
-			res.json(results);		
-		}
-	})	
-});
 
-router.post('/addStudent',(req, res)=>{
-	// This data is posted from axios in React (App.js)
-	const studentName = req.body.studentName;
-	var insertQuery = `INSERT INTO students 
-		(name)
-		VALUES
-		(?);`
-	var promiseOne = new Promise((resolve, reject)=>{
-		connection.query(insertQuery,[studentName],(error)=>{
-			if (error){
-				reject(error);
-			}else{
-				resolve({msg:"Success"});
-			}
-		})
-	});
-	// .then will run on our promise when it's finished.
-	// We can make them both on the same indent this way!
-	promiseOne.then((data)=>{
-		var promiseTwo = new Promise((resolve, reject)=>{
-			const query = `SELECT * FROM students;`;
-			connection.query(query,(error, results)=>{
-				if(error){
-					reject(error);
-				}else{
-					resolve(results)
-				}
-			})
-		});
-		promiseTwo.then((studentsList)=>{
-			res.json(studentsList)
-		})
-	})
+// include rand-token for generating a random token
+var randToken = require('rand-token');
+// console.log(randToken.uid(100));
 
+router.post('/register', (req, res, next)=> {
+	console.log(req.body);
 	// res.json(req.body);
+	const userData = req.body;
+
+	// const nameAsArray = req.body.name.split("");
+	// const firstName = nameAsArray[0]
+
+
+	// Express just got a post request to /register.
+	// This must be from our react app.
+	// Specifically, the /register form.
+	// This means, someone is trying to register!
+	// We have their data inside of userData.
+
+	// We need to insert their data into 2 tables.
+		// 1. Users.
+		// - User table needs their customer ID from the customers table.
+		// - password, which needs to be hashed.
+		// - email
+		// - artbitrary token which Express will create.
+
+		// 2. Customers.
+		// - Will want their name, city, state, salesRep, creditLimit,
+		// - FIRST query will check to see if the user is already in users.
+			// - IF they are, res.json({msg:"userExists"})
+			// - if they AREN'T ... insert user into customers FIRST
+			// (because we need CID for user)
+			// - insert user into users
+			// res.json({msg:"userInsert", token: token, name: name})
+
+		// FIRST check to see if user exists. We will use email.
+		const checkEmail = new Promise((resolve, reject) =>{
+		const checkEmailQuery = `SELECT * FROM users WHERE email = ?;`;
+		connection.query(checkEmailQuery,[userData.email],(error, results)=>{
+			if (error) { 
+				throw error; //for development
+				// reject(error) //in production
+			}else if(results.length > 0){
+				// user exists already. goodbye.
+				reject({
+					msg: "userExists"
+				})
+			}else{
+				// no error. no user. resolve (we dont care about results)
+				resolve()
+			}
+		});
+	})
+	checkEmail.then(
+		// code to run if our checkEmail resolves.
+		()=>{
+			console.log("User is not in the db.")
+			const insertIntoCust = `INSERT INTO customers
+			(customerName, city, state, salesRepEmployeeNumber, creditLimit)
+				VALUES
+			(?,?,?,?,?)`;
+			connection.query(insertIntoCust,[userData.name,userData.city,userData.state,1337,100000],(error, results)=>{
+				if(error){
+					console.log(error);
+					throw error;
+				}
+				// get the customer ID that was JUST inseterd (results)
+				const newID = results.insertId;
+				// Set up a random string for this user's token
+				// We will store it in teh DB
+				const token = randToken.uid(60);
+				// hashSync will create a blowfish/crypt (something evil) 
+				// hash we will insert into the DB
+				const hash = bcrypt.hashSync(userData.password);
+				console.log(newID);
+				const insertUsers = `INSERT INTO users
+				(cid,type,password,token,email)
+					VALUES
+				(?,?,?,?,?);`;
+				connection.query(insertUsers,[newID,'customer',hash,token,userData.email],(error,results)=>{
+					if(error){
+						throw error; //Dev only
+					}else{
+						// If we get this far... this is goign to be
+						// whats inside of the authReducer.
+						res.json({
+							token: token,
+							name: userData.name,
+							msg: "registerSuccess"
+						})
+					}
+				})
+			});
+		}
+	).catch(
+	// code to run if checkEmail rejects
+		(error)=>{
+			console.log(error);
+			res.json(error);
+		}
+	)
 })
 
 
