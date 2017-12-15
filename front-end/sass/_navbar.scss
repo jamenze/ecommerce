@@ -1,31 +1,30 @@
-.navbar-white {
+.navbar-white{
 	background-color: white;
 }
 
-.nav.pull-right {
-	li {
-		a {
-			display: inline; //default is block, not inline
+.nav.pull-right{
+	li{
+		a{
+			display: inline;
 		}
 	}
-
 }
 
-.dropdown {
+.dropdown{
 	position: relative;
-	.dropdown-links {
+	.dropdown-links{
 		display: none;
 	}
-	&:hover .dropdown-links {
+	&:hover .dropdown-links{
 		display: block;
 	}
-	a {
+	a{
 		display: block;
 		background-color: #f8f8f8;
 		position: absolute;
 		left: 20px;
 		width: 150px;
-		&:hover {
+		&:hover{
 			color: black;
 			text-decoration: none;
 		}
@@ -33,7 +32,7 @@
 }
 
 $menu_links: 8;
-@for $i from 0 to $menu_links {
+@for $i from 0 to $menu_links{
 	.dropdown-links a:nth-child(#{$i}){
 		top: 15 + ($i * 20)+px
 	}

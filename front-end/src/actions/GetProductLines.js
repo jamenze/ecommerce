@@ -2,6 +2,7 @@ import axios from 'axios';
 
 export default function(){
 	const ajaxPromise = axios.get(`${window.apiHost}/productlines/get`);
+	console.log(ajaxPromise)
 	return{
 		type: "GET_PRODUCTLINES",
 		// axios doens't just return the data, it returns:
