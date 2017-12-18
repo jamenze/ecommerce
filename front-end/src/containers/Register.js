@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form, FormGroup, ControlLabel, FormControl, Button, Col, MenuItem} from 'react-bootstrap';
+import {Form, FormGroup, ControlLabel, FormControl, Button, Col} from 'react-bootstrap';
 import { connect } from 'react-redux';
 // we need bindActionCreators so that we can correlate an action to the dispatcher
 // It's down below inside of mapDispatchToProps
@@ -43,6 +43,7 @@ class Register extends Component{
 			state: event.target[5].value,
 			salesRep: event.target[6].value
 		}
+
 		if(formData.name === ""){
 			this.setState({
 				error: "Name field cannot be empty.",
@@ -57,7 +58,7 @@ class Register extends Component{
 	render(){
 		console.log(this.props.auth);
 		if(this.state.type === "error"){
-			var msgClass = "text-dagner"
+			// var msgClass = "text-dagner"
 		}
 		return(
 			<Form horizontal onSubmit={this.handleSubmit}>
@@ -148,7 +149,7 @@ function mapDispatchToProps(dispatch){
 }
 
 // export default Register;
-console.log(connect);
+// console.log(connect);
 // var connectWithReduxFunction = connect(mapStateToProps,mapDispatchToProps);
 // var componentThatKnowsAboutRedux = connectWithReduxFunction(Register)
 export default connect(mapStateToProps,mapDispatchToProps)(Register);

@@ -1,5 +1,6 @@
-// An action is a JavaScript function that returns and object.
-// That object must have at least a property of "type" at the very least
+// An action is a JavaScript function that returns
+// an object. That object MUST have at least a property of "type"
+
 import axios from 'axios';
 
 export default function(formData){
@@ -10,14 +11,13 @@ export default function(formData){
 		method: "POST",
 		data: formData
 	});
-
-
+	console.log(axiosPromise);
 	// our redux-promise middleware will kick in
-	// because the payload value is a promise.
+	// because the payload value is a promise
 	// redux-promise will hold up the dispatch
-	// until it resolves.
-	return {
+	// until it resolves
+	return{
 		type: "AUTH_ACTION",
-		payload: axiosPromise // thing that comes along with the type
+		payload: axiosPromise
 	}
 }

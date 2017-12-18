@@ -12,13 +12,15 @@ import { combineReducers } from 'redux';
 // First: AuthReducer
 import AuthReducer from './AuthReducer';
 import ProductLineReducer from './ProductLineReducer';
+import CartReducer from './CartReducer'
+
 // combineReducers takes an object as an arg
 // that arg has key:value pair = stateName: reducerFunction
 // the reducerFunction will return a value
 const rootReducer = combineReducers({
 	auth: AuthReducer,
-	pl: ProductLineReducer
-
+	pl: ProductLineReducer,
+	cart: CartReducer
 })
 
 export default rootReducer;
