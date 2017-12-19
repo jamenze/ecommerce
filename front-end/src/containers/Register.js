@@ -56,14 +56,14 @@ class Register extends Component{
 	}
 
 	render(){
-		console.log(this.props.auth);
+		// console.log(this.props.auth);
 		if(this.state.type === "error"){
 			// var msgClass = "text-dagner"
 		}
 		return(
 			<Form horizontal onSubmit={this.handleSubmit}>
 				<h2 className="bg-danger">{this.state.error}</h2>
-	        <FormGroup controlId="formHorizontalName" validationState={this.state.nameError}>
+	        <FormGroup controlId="formHorizontalError" validationState={this.state.nameError}>
 	            <Col componentClass={ControlLabel} sm={2}>
 	                Name
 	            </Col>
@@ -79,7 +79,7 @@ class Register extends Component{
 	                <FormControl type="email" name="email" placeholder="Email" />
 	            </Col>
 	        </FormGroup>
-	        <FormGroup controlId="formHorizontalName">
+	        <FormGroup controlId="formHorizontalEmail">
 	            <Col componentClass={ControlLabel} sm={2}>
 	                Account Type
 	            </Col>
@@ -87,7 +87,7 @@ class Register extends Component{
 	                <FormControl type="text" name="type" value="customer" disabled />
 	            </Col>
 	        </FormGroup>
-	        <FormGroup controlId="formHorizontalName">
+	        <FormGroup controlId="formHorizontalPass">
 	            <Col componentClass={ControlLabel} sm={2}>
 	                Password
 	            </Col>
@@ -95,7 +95,7 @@ class Register extends Component{
 	                <FormControl type="password" name="password" placeholder="Password" />
 	            </Col>
 	        </FormGroup>
-	        <FormGroup controlId="formHorizontalName">
+	        <FormGroup controlId="formHorizontalCity">
 	            <Col componentClass={ControlLabel} sm={2}>
 	                City
 	            </Col>
@@ -103,7 +103,7 @@ class Register extends Component{
 	                <FormControl type="text" name="city" placeholder="City" />
 	            </Col>
 	        </FormGroup>
-	        <FormGroup controlId="formHorizontalName">
+	        <FormGroup controlId="formHorizontalState">
 	            <Col componentClass={ControlLabel} sm={2}>
 	                State
 	            </Col>
@@ -111,7 +111,7 @@ class Register extends Component{
 	                <FormControl type="text" name="state" placeholder="State" />
 	            </Col>
 	        </FormGroup>
-	        <FormGroup controlId="formHorizontalName">
+	        <FormGroup controlId="formHorizontalEmp">
 	            <Col componentClass={ControlLabel} sm={2}>
 	                Sales Rep
 	            </Col>
@@ -154,3 +154,4 @@ function mapDispatchToProps(dispatch){
 // var componentThatKnowsAboutRedux = connectWithReduxFunction(Register)
 export default connect(mapStateToProps,mapDispatchToProps)(Register);
 // export default componentThatKnowsAboutRedux;
+

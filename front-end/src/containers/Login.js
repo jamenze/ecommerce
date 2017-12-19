@@ -47,7 +47,7 @@ class Login extends Component{
   }
 
 	render(){
-		console.log(this.props.auth);
+		// console.log(this.props.auth);
 
 		return(
 			<div className="register-wrapper">
@@ -61,7 +61,7 @@ class Login extends Component{
 							<FormControl required="true" type="email" name="email" placeholder="Email" />
 						</Col>
 					</FormGroup>
-					<FormGroup controlId="formHorizontalName" validationState={this.state.emailError}>
+					<FormGroup controlId="formHorizontalEmail" validationState={this.state.emailError}>
 						<Col componentClass={ControlLabel} sm={2}>
 							Password
 						</Col>

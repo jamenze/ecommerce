@@ -2,13 +2,49 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GetCart from '../actions/GetCart';
+import { Link } from 'react-router-dom';
+import CartRow from '../components/CartRow';
+import axios from 'axios';
 
 class Cart extends Component{
-
-	constructor() {
+	constructor(){
 		super();
 		this.makePayment = this.makePayment.bind(this);
 	}
+
+	makePayment() {
+        var handler = window.StripeCheckout.configure({
+            key: 'pk_test_K9L17worNm0z7lHpdssTpwqr',
+            locale: 'auto',
+            image: 'http://www.digitalcrafts.com/sites/all/themes/digitalcrafts/images/digitalcrafts-site-logo.png',
+            token: (token) => {
+            	console.log(token);
+            	console.log(this.props.auth.token);
+                var theData = {
+                    amount: this.props.cart.totalPrice * 100,
+                    stripeToken: token.id,
+                    userToken: this.props.auth.token,
+                }
+                axios({
+                    method: 'POST',
+                    url: `${window.apiHost}/stripe`,
+                    data: theData
+                }).then((response) => {
+                    console.log(response);
+                    if (response.data.msg === 'paymentSuccess') {
+                    	this.props.history.push('/thankyou')
+                    }else{
+                    	console.log(response.data.msg)
+                    }
+                });
+            }
+        });
+        handler.open({
+            name: "Pay Now",
+            description: 'Classic Models order',
+            amount: this.props.cart.totalPrice * 100 //the total is in pennies
+        })
+    }
 
 	componentDidMount(){
 		console.log(this.props.auth);
@@ -21,48 +57,40 @@ class Cart extends Component{
 		}
 	}
 
-	makePayment() {
-        var handler = window.StripeCheckout.configure({
-            key: 'pk_test_aj8GszmxnsDvaNM10ZFt9ECA',
-            locale: 'auto',
-            token: (token) => {
-                var theData = {
-                    amount: 10 * 100,
-                    stripeToken: token.id,
-                    userToken: this.props.tokenData,
-                }
-                axios({
-                    method: 'POST',
-                    url: window.hostAdress'/stripe',
-                    data: theData
-                }).done((data) => {
-                    console.log(data);
-                    if (data.msg === 'paymentSuccess') {
-
-                    }
-                });
-            }
-        });
-        handler.open({
-            name: "Pay Now",
-            description: 'Pay Now',
-            amount: 10 * 100
-        })
-    }
-
 	render(){
 		console.log(this.props.cart);
 		if(!this.props.cart.totalItems){
+			// if this return occurs, the render is DONE
 			return(
-				// if this return occurs, the render is DONE
 				<div>
-					<h3>Your cart is empty! Get shopping!</h3>
+					<h3>Your cart is empty! Get shopping or <Link to="/login">login</Link></h3>
+				</div>
+			)
+		}else{
+			var cartArray = this.props.cart.products.map((product,index)=>{
+				console.log(product)
+				return (
+					<CartRow key={index} product={product} />
+				)
+			})
+			return(
+				<div>
+					<h2>Your order total is: ${this.props.cart.totalPrice} - <button className="btn btn-primary" onClick={this.makePayment}>Checkout!</button></h2>
+					<table className="table table-striped">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Price</th>
+								<th>Remove</th>
+							</tr>
+						</thead>
+						<tbody>
+							{cartArray}
+						</tbody>
+					</table>
 				</div>
 			)
 		}
-		return(
-			<h1>Cart Page</h1>
-		)
 	}
 }
 

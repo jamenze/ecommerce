@@ -111,4 +111,4 @@ function mapDispatchToProps(dispatch){
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(NavBar);
-// export default NavBar;// export default NavBar;
+// export default NavBar;

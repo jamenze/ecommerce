@@ -1,9 +1,15 @@
 import React from 'react';
 
-function CartRow(props) {
+// export default (props)=>{}
+
+function CartRow(props){
 	const product = props.product;
-	return (
-		<h1>{product}
+	return(
+		<tr>
+			<td>{product.productName}</td>
+			<td>{product.buyPrice}</td>
+			<td><button className="btn btn-danger">Delete</button></td>
+		</tr>
 	)
 }
 
