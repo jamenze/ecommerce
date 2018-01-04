@@ -325,11 +325,11 @@ router.post('/stripe',(req, res, next)=>{
 		}else{
 			// Insert stuff from cart that was just paid into:
 			// - orders
-			const getUserQuery = `SELECT users.id, users.cid,cart.productCode,products.buyPrice, COUNT(cart.productCode) as quantity FROM users 
-				INNER JOIN cart ON users.id = cart.uid
-				INNER JOIN products ON cart.productCode = products.productCode
-			WHERE token = ?
-			GROUP BY cart.productCode`
+			const getUserQuery = `SELECT MAX(users.id) as id, MAX(users.cid) as cid, MAX(cart.productCode) as productCode, MAX(products.buyPrice) as buyPrice, COUNT(cart.productCode) as quantity FROM users 
+			    INNER JOIN cart ON users.id = cart.uid
+			    INNER JOIN products ON cart.productCode = products.productCode
+			    WHERE token = ?
+			    GROUP BY cart.productCode`
 			console.log(userToken)
 			console.log(getUserQuery);
 			connection.query(getUserQuery, [userToken], (error2, results2)=>{
